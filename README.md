@@ -58,9 +58,10 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
 
 ![Original image and sobel x-axis transformed image.][orig_sobel_x]
-![Sobel y-axis transformed and magnitude thresholded images][sobel_y_thres_mag]
+![Sobel y-axis transformed and magnitude thresholded images.][sobel_y_thres_mag]
+
 ![Original and histogram thresholded images.][orig_his_thresh]
-![Gradient directioin and combined thresholds images.][grad_dir_comb_thresh]
+![Gradient direction and combined thresholds images.][grad_dir_comb_thresh]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
