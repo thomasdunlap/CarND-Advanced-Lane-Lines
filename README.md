@@ -19,7 +19,7 @@
 [orig_sobel_x]: ./output_images/orig_sobel_x.png "Sobel X-axis Transformation"
 [grad_dir_comb_thresh]: ./output_images/grad_dir_comb_thresh.png "Gradient Directions"
 [orig_his_thresh]: ./output_images/orig_his_thresh.png "Histogram Threshold Image"
-[warped_mask]: ./output_images/warped_mask.png "Warp Example"
+[sobel_y_thres_mag]: ./output_images/sobel_y_thres_mag.png "Sobel Y-axis and  Magnitude Images"
 [warped_mask]: ./output_images/warped_mask.png "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
 [vid_img]: ./output_images/video_img.png "Output"
@@ -57,7 +57,10 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
 
-![alt text][image3]
+![Original image and sobel x-axis transformed image.][orig_sobel_x]
+![Sobel y-axis transformed and magnitude thresholded images][sobel_y_thres_mag]
+![Original and histogram thresholded images.][orig_his_thresh]
+![Gradient directioin and combined thresholds images.][grad_dir_comb_thresh]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
