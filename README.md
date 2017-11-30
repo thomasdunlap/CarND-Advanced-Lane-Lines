@@ -15,7 +15,7 @@
 [//]: # (Image References)
 
 [undist]: ./output_images/undist.png "Undistorted"
-[image2]: ./test_images/test1.jpg "Road Transformed"
+[undist_road]: ./output_images/undist_road.png "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./output_images/warped_mask.png "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
@@ -48,7 +48,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 #### 1. Provide an example of a distortion-corrected image.
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
+![Road image and undistorted road image.][undist_road]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
