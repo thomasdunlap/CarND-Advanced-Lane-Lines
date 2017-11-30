@@ -1,12 +1,7 @@
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
+# **Advanced Lane Finding Project**
+![Image from final video][vid_img]
 ---
-
-**Advanced Lane Finding Project**
-
-The goals / steps of this project are the following:
+## The goals / steps of this project are the following:
 
 * Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
 * Apply a distortion correction to raw images.
@@ -24,7 +19,7 @@ The goals / steps of this project are the following:
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./output_images/warped_mask.png "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
+[vid_img]: ./output_images/video_img.png "Output"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
