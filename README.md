@@ -1,6 +1,6 @@
 # **Advanced Lane Finding Project**
 ![Image from final video][vid_img]
----
+----
 ## The goals / steps of this project are the following:
 
 * Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
@@ -14,7 +14,7 @@
 
 [//]: # (Image References)
 
-[image1]: ./output_images/undist.png "Undistorted"
+[undist]: ./output_images/undist.png "Undistorted"
 [image2]: ./test_images/test1.jpg "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./output_images/warped_mask.png "Warp Example"
@@ -22,15 +22,12 @@
 [vid_img]: ./output_images/video_img.png "Output"
 [video1]: ./project_video.mp4 "Video"
 
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
----
+----
 
 ### Writeup / README
 
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+#### 1. Provide a README that covers all the [rubric](https://review.udacity.com/#!/rubrics/571/view) points and how you addressed each one.   
 
 You're reading it!
 
@@ -44,7 +41,7 @@ I start by preparing "object points", which will be the (x, y, z) coordinates of
 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result:
 
-![alt text][image1]
+![Distorted and undistorted checkerboard comparison.][undist]
 
 ### Pipeline (single images)
 
@@ -103,7 +100,7 @@ I did this in lines # through # in my code in `my_other_file.py`
 
 I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
 
-![alt text][image6]
+![Image of final video.][vid_img]
 
 ---
 
