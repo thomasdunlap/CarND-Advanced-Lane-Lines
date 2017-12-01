@@ -17,7 +17,7 @@
 [undist]: ./output_images/undist.png "Undistorted"
 [undist_road]: ./output_images/undist_road.png "Road Transformed"
 [orig_sobel_x]: ./output_images/orig_sobel_x.png "Sobel X-axis Transformation"
-[hist_thresh]: ./output_images/orig_his_thresh.png "Histogram Threshold Image"
+[hls_thresh]: ./output_images/orig_hls_thresh.png "Histogram Threshold Image"
 [grad_dir_comb_thresh]: ./output_images/grad_dir_comb_thresh.png "Gradient Directions"
 [sobel_y_thres_mag]: ./output_images/sobel_y_thres_mag.png "Sobel Y-axis and  Magnitude Images"
 [warped_mask]: ./output_images/warped_mask.png "Warp Example"
@@ -59,7 +59,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ![Original image and sobel x-axis transformed image.][orig_sobel_x]
 ![Sobel y-axis and magnitude thresholded images.][sobel_y_thres_mag]
-![Thresholded image.][hist_thresh]
+![Thresholded image.][hls_thresh]
 ![Gradient direction and combined thresholds images.][grad_dir_comb_thresh]
 
 
