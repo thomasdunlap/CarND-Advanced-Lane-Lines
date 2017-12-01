@@ -77,10 +77,16 @@ It reads the image file path, converting the image to RGB using the `mpimg.imrea
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image ().  Here's a example of my output for this step.  (note: this is not actually from one of the test images)
 
 ![Original image and sobel x-axis transformed image.][orig_sobel_x]
+
+Here is a comparison between the original image, and a Sobel x-axis transformed image.  Sobel transformations basically return a binary image - if a specificed number of gradients are all in the same direction forming a line, the function returns 1's (white) for those pixels, and 0's (black) if lines aren't found.  X-axis Sobel transformations work well for identifying vertical lines, while y-axis Sobel transformations are better at vertical lines.  I then took a maginitude threshold of the combined x- and y-axis transformations, where only a 1 was returned if both Sobels had 1's in that location, otherwise it returned a black zero. Here's an example of a y-transformation and magnitude threshold images:
+
 ![Sobel y-axis and magnitude thresholded images.][sobel_y_thres_mag]
+
+These are different images!
+
 ![Thresholded image.][hls_thresh]
 ![Gradient direction and combined thresholds images.][grad_dir_comb_thresh]
 
