@@ -153,4 +153,6 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+My pipeline becomes less stable when going around sharp curves, or in areas where there are a lot of shadows, or inconsistent lighting that the camera has to adjust to.  I'm sure the pipeline would also have trouble in snow or rain as well, or if there was construction  with a lot line confusing lines, or complete lack of lines.  It would also probably have a hard time in a city like Boston, where the roads can be difficult and confusing for even humans. We mostly have ideal conditions with the video, and you don't have to live long to know the world is rarely provides the conditions we expect.
+
+Improvements could definitely be made by having a higher-quality camera that adjusts rapidly to light changes, possibly introducing precipitation-like noise to the image, and more testing under various conditions.  
