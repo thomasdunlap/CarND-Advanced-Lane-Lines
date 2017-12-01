@@ -158,9 +158,7 @@ I implemented this step in code block 15 in the function `map_lane()`. Here is t
 
 This function starts by creating `warp_zero` a blank image to draw lines on, and `color_warp`, which takes the `warped` grayscale image, and stacks in RGB layers. Next it creates `pts`, a horizontal stack of `pts_left` and `pts_right`, which hold our lane line drawing points.  The lane lines are then draw onto `color_warp` with `cv2.fillPoly()`, and the unwarped into `new_warp`.  `new_warp` now exists in the "real world" space, and is overlayed onto our undistorted image using `cv2.addWeighted()`.
 
-I've additionally added a thumbnail video of `out_img`'s as the car moves forward in the video, and text displaying radius of curvature and vehicle offset in the rest of the code.
-
-Here is an example of my result on a test image:
+I've additionally added a thumbnail video of `out_img`'s as the car moves forward in the video, and text displaying radius of curvature and vehicle offset in the rest of the code.  Here is an example of my result on a test image:
 
 ![Image of final video.][vid_img]
 
