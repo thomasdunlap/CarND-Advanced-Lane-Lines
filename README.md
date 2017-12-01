@@ -135,7 +135,57 @@ I did this in lines # through # in my code in `my_other_file.py`
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in code block 15 in the function `map_lane()`:
+
+```python
+def map_lane(warped, undistorted, out_img, ploty, left_fitx, right_fitx, left_curverad, right_curverad, lane_deviation):
+    """
+    Returns final image for video processing:
+    Fills in color on warped image lane lines.
+    Adds updating text and thumbnail video of warped lanes perspective to main video.
+    """
+
+    # Create an image to draw the lines on
+    warp_zero = np.zeros_like(warped).astype(np.uint8)
+    color_warp = np.dstack((warped, warped, warped))
+
+    # Recast the x and y points into usable format for cv2.fillPoly()
+    pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+    pts = np.hstack((pts_left, pts_right))
+
+    # Draw the lane onto the warped blank image
+    cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
+    # Warp the blank back to original image space using inverse perspective matrix (Minv)
+    new_warp = perspective_transform(color_warp, inv=True)
+    # Combine the result with the original image
+    weighted_img = cv2.addWeighted(undistorted, 1, new_warp, 0.3, 0)
+
+    # Add thumbnail video of warped lane curvature in upper right corner of video
+    x_offset = weighted_img.shape[1] - 320 - 30
+    y_offset = 30
+    thumbnail = cv2.resize(out_img, (320, 200), interpolation = cv2.INTER_CUBIC)
+    weighted_img[y_offset:y_offset + thumbnail.shape[0], x_offset:x_offset + thumbnail.shape[1]] = thumbnail
+
+    # Define font and text labels to be added to video
+    font = cv2.FONT_HERSHEY_TRIPLEX
+    left_label = 'Left Line Radius of Curvature: {:.1f} m'.format(left_curverad)
+    right_label = 'Right Line Radius of Curvature: {:.1f} m'.format(right_curverad)
+    deviation_label = 'Vehicle Deviation: {:.3f} m'.format(lane_deviation)
+
+    # Add text labels to video
+    cv2.putText(weighted_img, left_label, (30, 40), font, 1, (255,255,255), 2)
+    cv2.putText(weighted_img, right_label, (30, 90), font, 1, (255,255,255), 2)
+    cv2.putText(weighted_img, deviation_label, (30, 140), font, 1, (255,255,255), 2)
+
+    return weighted_img
+```
+
+This function starts by creating `warp_zero` a blank image to draw lines on, and `color_warp`, which takes the `warped` grayscale image, and stacks in RGB layers. Next it creates `pts`, a horizontal stack of `pts_left` and `pts_right`, which hold our lane line drawing points.  The lane lines are then draw onto `color_warp` with `cv2.fillPoly()`, and the unwarped into `new_warp`.  `new_warp` now exists in the "real world" space, and is overlayed onto our undistorted image using `cv2.addWeighted()`.
+
+I've additionally added a thumbnail video of `out_img`'s as the car moves forward in the video, and text displaying radius of curvature and vehicle offset in the rest of the code.
+
+Here is an example of my result on a test image:
 
 ![Image of final video.][vid_img]
 
