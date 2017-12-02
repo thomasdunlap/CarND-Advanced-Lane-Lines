@@ -75,7 +75,7 @@ def undistort(image, visualize=False):
 
 It reads the image file path, converting the image to RGB using the `mpimg.imread()` function.  Then, using the OpenCV function `cv2.calibrateCamera()`, we pass in the `objpoints` and `imgpoints` from out ``
 
-#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+#### 2. Describe how you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
 I used a combination of color and gradient thresholds to generate a binary image ().  Here's a example of my output for this step.  (note: this is not actually from one of the test images)
 
@@ -85,17 +85,19 @@ Here is a comparison between the original image, and a Sobel x-axis transformed 
 
 ![Sobel y-axis and magnitude thresholded images.][sobel_y_thres_mag]
 
-These are different images!
+Then we took a binary image o the gradient direction, and further combined that with the magnitude threshold image:
 
-![Thresholded image.][hls_thresh]
 ![Gradient direction and combined thresholds images.][grad_dir_comb_thresh]
 
+Finally, I looked at saturation.  We converted the RGB image to HLS (Hue, Lightness, Saturation), and then just kept a saturation-thresholded binary image:
+
+![Thresholded image.][hls_thresh]
+
+This was then combined with another image to do something:
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
 The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
-
-
 
 ```python
 src = np.float32(
