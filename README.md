@@ -136,9 +136,52 @@ Then I did some other stuff and fit my lane lines with a 2nd order polynomial ki
 
 #### 5. Describe how you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this with FUNCTION in code block NUMBER:
+I found the position of the vehicle relative to center with the function `offset()`, and the radius of curavture with `curvature_with_offset()`, which are both located in code block 14.
+
+`offset()` begins by finding the bottom-most (x, y) coordinates of the left and right lanes, and averages those points together to calculate the lanes midpoint:
 
 ```python
+    # Calculate x bottom position for y for left lane
+    left_lane_bottom = (left_fit_cr[0] * (y_eval * ym_per_pix) ** 2 +
+                        left_fit_cr[1] * (y_eval * ym_per_pix) + left_fit_cr[2])
+    # Calculate x bottom position for y for right lane
+    right_lane_bottom = (right_fit_cr[0] * (y_eval * ym_per_pix) ** 2 +
+                         right_fit_cr[1] * (y_eval * ym_per_pix) + right_fit_cr[2])
+    # Calculate the mid point of the lane
+    lane_midpoint = float(right_lane_bottom + left_lane_bottom) / 2
+```
+
+Then it calculates the midpoint of the image in meters
+
+```python  
+    image_mid_point_in_meter = 1280/2 * xm_per_pix
+    # Positive value indicates vehicle on the right side of lane center, else on the left.
+    lane_deviation = (image_mid_point_in_meter - lane_midpoint)
+```
+
+
+```python
+# Define y-value where we want radius of curvature
+    # I'll choose the maximum y-value, corresponding to the bottom of the image
+    y_eval = np.max(ploty)
+    left_curverad = (((1 + (2 * left_fit[0] * y_eval + left_fit[1])**2)**1.5) /
+                     np.absolute(2 * left_fit[0]))
+    right_curverad = (((1 + (2 * right_fit[0] * y_eval + right_fit[1])**2)**1.5) /
+                      np.absolute(2 * right_fit[0]))
+
+    # Define conversions in x and y from pixels space to meters
+    ym_per_pix = 30 / 720   # meters per pixel in y dimension
+    xm_per_pix = 3.7 / 700  # meters per pixel in x dimension
+
+    # Fit a second order polynomial to each
+    left_fit_cr = np.polyfit(lefty * ym_per_pix, leftx * xm_per_pix, 2)
+    right_fit_cr = np.polyfit(righty * ym_per_pix, rightx * xm_per_pix, 2)
+
+    # Calculate the new radius of curvature in meters
+    left_curverad = ((1 + (2 * left_fit_cr[0] * y_eval * ym_per_pix +
+                           left_fit_cr[1])**2)**1.5) / np.absolute(2 * left_fit_cr[0])
+    right_curverad = ((1 + (2 * right_fit_cr[0] * y_eval * ym_per_pix +
+                            right_fit_cr[1])**2)**1.5) / np.absolute(2 * right_fit_cr[0])
 ```
 ![alt text][image5]
 
