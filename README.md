@@ -18,6 +18,7 @@
 [undist_road]: ./output_images/undist_road.png "Road Transformed"
 [orig_sobel_x]: ./output_images/orig_sobel_x.png "Sobel X-axis Transformation"
 [hls_thresh]: ./output_images/orig_hls_thresh.png "Histogram Threshold Image"
+[final_thresh]: ./output_images/final_thresh.png "Final Threshold Example"
 [grad_dir_comb_thresh]: ./output_images/grad_dir_comb_thresh.png "Gradient Directions"
 [sobel_y_thres_mag]: ./output_images/sobel_y_thres_mag.png "Sobel Y-axis and  Magnitude Images"
 [warped_mask]: ./output_images/warped_mask.png "Warp Example"
@@ -94,6 +95,8 @@ Finally, I looked at saturation.  We converted the RGB image to HLS (Hue, Lightn
 ![Thresholded image.][hls_thresh]
 
 This was then combined with another image to do something:
+
+![Final combination of all thresholds.][final_thresh]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
