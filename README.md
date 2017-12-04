@@ -98,40 +98,42 @@ Finally, all of these thresholded, binary images were combined.  Here is the uni
 
 ![Final combination of all thresholds.][final_thresh]
 
-#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+#### 3. Describe how you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose t0 hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warper()`, which appears in code cell 12.  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose to hardcode the source and destination points in the following manner:
 
 ```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+src = np.float32([[180, img.shape[0]], [575, 460], [705, 460], [1150, img.shape[0]]])
+
+dst = np.float32([[320, img.shape[0]], [320, 0], [960, 0], [960, img.shape[0]]])
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   |
 |:-------------:|:-------------:|
-| 585, 460      | 320, 0        |
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 575, 460      | 320, 0        |
+| 180, 720      | 320, 720      |
+| 1150, 720     | 960, 720      |
+| 705, 460      | 960, 0        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image:
 
 ![Original and warped with lines images.][perspective_wlines]
 
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+I also created a mask to block out points outside the lane lines:
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+![perspective transform image with mask][warped_mask]
 
+#### 4. Describe how you identified lane-line pixels and fit their positions with a polynomial?
+
+I find lane-line pixels and fit their positions by taking the `warped` image and running it throught the function `detect_lane_lines` in IPython cell 13.
+
+Find the starting point for the left and right lines (take a histogram of the bottom half of the masked image)
+Set the width of the windows +/- margin (= 100), set minimum number of pixels found to recenter window (= 50)
+If lines are not detected - step through the windows one by one
+Extract left and right line pixel positions and Fit a second order polynomial to each (using np.polyfit
+Generate x and y values for plotting
 
 
 #### 5. Describe how you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
