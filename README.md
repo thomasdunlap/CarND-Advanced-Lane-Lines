@@ -76,33 +76,31 @@ def undistort(image, visualize=False):
     return image, mtx, dist, dst
 ```
 
-It reads the image file path, converting the image to RGB using the `mpimg.imread()` function.  Then, using the OpenCV function `cv2.calibrateCamera()`, we pass in the `objpoints` and `imgpoints` from out ``
-
 #### 2. Describe how you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image ().  Here's a example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image. Here is a comparison between the original image, and a Sobel x-axis transformed image:
 
 ![Original image and sobel x-axis transformed image.][orig_sobel_x]
 
-Here is a comparison between the original image, and a Sobel x-axis transformed image.  Sobel transformations basically return a binary image - if a specificed number of gradients are all in the same direction forming a line, the function returns 1's (white) for those pixels, and 0's (black) if lines aren't found.  X-axis Sobel transformations work well for identifying vertical lines, while y-axis Sobel transformations are better at vertical lines.  I then took a maginitude threshold of the combined x- and y-axis transformations, where only a 1 was returned if both Sobels had 1's in that location, otherwise it returned a black zero. Here's an example of a y-transformation and magnitude threshold images:
+ Sobel transformations basically return a binary image - if a specified number of gradients are all in the same direction forming a line, the function returns 1's (white) for those pixels, and 0's (black) if lines aren't found.  X-axis Sobel transformations work well for identifying vertical lines, while y-axis Sobel transformations are better at vertical lines.  I then took a maginitude threshold of the combined x- and y-axis transformations, where only a 1 was returned if both Sobels had 1's in that location, otherwise it returned a black zero. Here's an example of a y-transformation and magnitude threshold images:
 
 ![Sobel y-axis and magnitude thresholded images.][sobel_y_thres_mag]
 
-Then we took a binary image o the gradient direction, and further combined that with the magnitude threshold image:
+Then I took a binary image of the gradient direction, and further combined that with the magnitude threshold image:
 
 ![Gradient direction and combined thresholds images.][grad_dir_comb_thresh]
 
-Finally, I looked at saturation.  We converted the RGB image to HLS (Hue, Lightness, Saturation), and then just kept a saturation-thresholded binary image:
+Saturation is also a great way to identify lane lines.  I converted the RGB image to HLS (Hue, Lightness, Saturation), and then just kept a saturation-thresholded binary image:
 
 ![Thresholded image.][hls_thresh]
 
-This was then combined with another image to do something:
+Finally, all of these thresholded, binary images were combined.  Here is the unidstorted orignal image compared to the final combined binaries image:
 
 ![Final combination of all thresholds.][final_thresh]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose t0 hardcode the source and destination points in the following manner:
 
 ```python
 src = np.float32(
