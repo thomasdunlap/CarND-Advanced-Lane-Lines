@@ -129,11 +129,209 @@ I also created a mask to block out points outside the lane lines:
 
 I find lane-line pixels and fit their positions by taking the `warped` image and running it throught the function `detect_lane_lines` in IPython cell 13.
 
-Find the starting point for the left and right lines (take a histogram of the bottom half of the masked image)
-Set the width of the windows +/- margin (= 100), set minimum number of pixels found to recenter window (= 50)
-If lines are not detected - step through the windows one by one
-Extract left and right line pixel positions and Fit a second order polynomial to each (using np.polyfit
-Generate x and y values for plotting
+I split the image in two, and take the max value of the histogram of each side as the lane line points.
+
+```python
+def find_base_pts(warped):
+    """
+    Returns midpoint of image, and histogram peaks on either side of midpoint.
+    """
+    # Take a histogram of the bottom half of the masked image
+    histogram = np.sum(warped[warped.shape[0] // 2:,:], axis=0)
+
+    # Find the peak of the left and right halves of the histogram
+    midpoint = np.int(histogram.shape[0] / 2)
+    leftx_base = np.argmax(histogram[:midpoint])
+    rightx_base = np.argmax(histogram[midpoint:]) + midpoint
+    return midpoint, leftx_base, rightx_base
+```
+
+Then I used "sliding windows" to look for new histogram maxes.
+
+```python
+def detect_lines(warped):
+    """
+    Returns x and y coordinates and fits of lane lines, as well as output image.
+    Detects lane lines.
+    """
+    lines_detected = False
+
+    # Find the starting point for the left and right lines
+    midpoint, leftx_base, rightx_base = find_base_pts(warped)
+    # Create an output image to draw on and  visualize the result
+    out_img = np.dstack((warped, warped, warped))*255
+
+    # Number of sliding windows
+    nwindows = 9
+    # Height of windows: e.g. 720/9=80
+    window_height = np.int(warped.shape[0] / nwindows)
+
+    # Identify the x and y positions of all nonzero pixels in the image
+    nonzero = warped.nonzero()
+    nonzeroy = np.array(nonzero[0])
+    nonzerox = np.array(nonzero[1])
+
+    # Current positions to be updated for each window
+    leftx_current = leftx_base
+    rightx_current = rightx_base
+    # Set the width of the windows +/- margin
+    margin = 100
+    # Set minimum number of pixels found to recenter window
+    minpix = 50
+    # Create empty lists to receive left and right lane pixel indices
+    left_lane_inds = []
+    right_lane_inds = []
+
+    # Sliding windows
+    if (left_line.detected == False) or (right_line.detected == False) :
+        # Step through the windows one by one
+        for window in range(nwindows):
+            # Identify window boundaries in x and y (and right and left)
+            win_y_low = warped.shape[0] - (window + 1) * window_height
+            win_y_high = warped.shape[0] - window * window_height
+            win_xleft_low = leftx_current - margin
+            win_xleft_high = leftx_current + margin
+            win_xright_low = rightx_current - margin
+            win_xright_high = rightx_current + margin
+
+            # Draw the windows on the visualization image
+            cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high), (0,255,0), 5)
+            cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high), (0,255,0), 5)
+
+            # Identify the nonzero pixels in x and y within the window
+            good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
+                              (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
+            good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
+                               (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
+
+            # Append these indices to the lists
+            left_lane_inds.append(good_left_inds)
+            right_lane_inds.append(good_right_inds)
+
+            # If you found > minpix pixels, recenter next window on their mean position
+            if len(good_left_inds) > minpix:
+                leftx_current = np.int(np.mean(nonzerox[good_left_inds]))
+            if len(good_right_inds) > minpix:        
+                rightx_current = np.int(np.mean(nonzerox[good_right_inds]))
+
+        # Concatenate the arrays of indices
+        left_lane_inds = np.concatenate(left_lane_inds)
+        right_lane_inds = np.concatenate(right_lane_inds)
+        left_line.detected = True
+        right_line.detected = True
+    else:
+        left_lane_inds = ((nonzerox > (left_line.current_fit[0] * (nonzeroy**2) +
+                                       left_line.current_fit[1] * nonzeroy +
+                                       left_line.current_fit[2] - margin)) &
+                          (nonzerox < (left_line.current_fit[0] * (nonzeroy**2) +
+                                       left_line.current_fit[1] * nonzeroy +
+                                       left_line.current_fit[2] + margin)))
+        right_lane_inds = ((nonzerox > (right_line.current_fit[0] * (nonzeroy**2) +
+                                        right_line.current_fit[1] * nonzeroy +
+                                        right_line.current_fit[2] - margin)) &
+                           (nonzerox < (right_line.current_fit[0] * (nonzeroy**2) +
+                                        right_line.current_fit[1] * nonzeroy +
+                                        right_line.current_fit[2] + margin)))
+    # Extract left and right line pixel positions
+    leftx = nonzerox[left_lane_inds]
+    lefty = nonzeroy[left_lane_inds]
+    rightx = nonzerox[right_lane_inds]
+    righty = nonzeroy[right_lane_inds]
+
+    # Here we need to save successful fit of lines to prevent case with empty x, y
+    if (len(leftx) < 1500):
+        leftx = left_line.allx
+        lefty = left_line.ally
+        left_line.detected = False
+    else:
+        left_line.allx = leftx
+        left_line.ally = lefty
+    if (len(rightx) < 1500):
+        rightx = right_line.allx
+        righty = right_line.ally
+        right_line.detected = False
+    else:
+        right_line.allx = rightx
+        right_line.ally = righty
+
+    # Fit a second order polynomial to each
+    right_fit = np.polyfit(righty, rightx, 2)
+    left_fit = np.polyfit(lefty, leftx, 2)
+
+    # Sanity check:
+    # INIT
+    if (left_line.current_fit[0] == False):
+        left_line.current_fit = left_fit
+        right_line.current_fit = right_fit
+
+    if (abs(left_line.current_fit[1] - left_fit[1]) > 0.18):
+        left_line.current_fit = left_line.best_fit
+        left_line.detected = False
+    else:
+        left_line.current_fit = left_fit
+        left_line.recent_xfitted.pop()
+        left_line.recent_xfitted.appendleft(left_line.current_fit)
+        avg = np.array([0,0,0], dtype='float')
+        for element in left_line.recent_xfitted:
+            avg = avg + element
+        left_line.best_fit = avg / (len(left_line.recent_xfitted))
+
+    if (abs(right_line.current_fit[1] - right_fit[1]) > 0.18):
+        right_line.current_fit = right_line.best_fit
+        right_line.detected = False
+    else:
+        right_line.current_fit = right_fit
+        right_line.recent_xfitted.pop()
+        right_line.recent_xfitted.appendleft(right_line.current_fit)
+        avg = np.array([0,0,0], dtype='float')
+        for element in right_line.recent_xfitted:
+            avg = avg + element
+        right_line.best_fit = avg / (len(right_line.recent_xfitted))
+
+    if (abs(right_line.current_fit[1] - right_fit[1]) > 0.38 and
+        abs(left_line.current_fit[1] - left_fit[1]) < 0.1):
+        right_line.current_fit[0] = left_line.current_fit[0]
+        right_line.current_fit[1] = left_line.current_fit[1]
+        right_line.current_fit[2] = left_line.current_fit[2] + 600
+        right_line.recent_xfitted.pop()
+        right_line.recent_xfitted.appendleft(right_line.current_fit)
+        avg = np.array([0,0,0], dtype='float')
+        for element in right_line.recent_xfitted:
+            avg = avg + element
+        right_line.best_fit = avg / (len(right_line.recent_xfitted))
+
+    if (abs(left_line.current_fit[1] - left_fit[1]) > 0.38 and
+        abs(right_line.current_fit[1] - right_fit[1]) < 0.1):
+        left_line.current_fit = left_fit
+        left_line.recent_xfitted.pop()
+        left_line.recent_xfitted.appendleft(left_line.current_fit)
+        avg = np.array([0,0,0], dtype='float')
+        for element in left_line.recent_xfitted:
+            avg = avg + element
+        left_line.best_fit = avg / (len(left_line.recent_xfitted))
+
+    # Generate x and y values for plotting
+    ploty = np.linspace(0, warped.shape[0] - 1, warped.shape[0] )
+    left_fitx = (left_line.current_fit[0] * ploty**2 +
+                 left_line.current_fit[1] * ploty +
+                 left_line.current_fit[2])
+    right_fitx = (right_line.current_fit[0] * ploty**2 +
+                  right_line.current_fit[1] * ploty +
+                  right_line.current_fit[2])
+    out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
+    out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+
+    fig = plt.figure(figsize=(18, 6))
+    plt.imshow(out_img)
+    plt.plot(left_fitx, ploty, color='yellow')
+    plt.plot(right_fitx, ploty, color='yellow')
+    plt.xlim(0, 1280)
+    plt.ylim(720, 0)
+
+    return out_img, ploty, leftx, lefty, rightx, righty, left_fit, right_fit, left_fitx, right_fitx
+```
+
+Finally we save the left and right line pixel positions and use the `np.polyfit()` function to find the second order polynomials, and their respective x and y values.
 
 
 #### 5. Describe how you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
