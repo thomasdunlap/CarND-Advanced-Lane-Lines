@@ -127,7 +127,7 @@ I also created a mask to block out points outside the lane lines:
 
 #### 4. Describe how you identified lane-line pixels and fit their positions with a polynomial?
 
-I find lane-line pixels and fit their positions by taking the `warped` image and running it throught the function `detect_lane_lines` in IPython cell 13.
+I find lane-line pixels and fit their positions by taking the `warped` image and running it throught the function `detect_lines()` in IPython cell 13.
 
 I split the image in two, and take the max value of the histogram of each side as the lane line points.
 
@@ -146,21 +146,9 @@ def find_base_pts(warped):
     return midpoint, leftx_base, rightx_base
 ```
 
-Then I used "sliding windows" to look for new histogram maxes.
+Then I used "sliding windows" to look for new histogram maxes:
 
 ```python
-def detect_lines(warped):
-    """
-    Returns x and y coordinates and fits of lane lines, as well as output image.
-    Detects lane lines.
-    """
-    lines_detected = False
-
-    # Find the starting point for the left and right lines
-    midpoint, leftx_base, rightx_base = find_base_pts(warped)
-    # Create an output image to draw on and  visualize the result
-    out_img = np.dstack((warped, warped, warped))*255
-
     # Number of sliding windows
     nwindows = 9
     # Height of windows: e.g. 720/9=80
@@ -232,6 +220,10 @@ def detect_lines(warped):
                            (nonzerox < (right_line.current_fit[0] * (nonzeroy**2) +
                                         right_line.current_fit[1] * nonzeroy +
                                         right_line.current_fit[2] + margin)))
+```
+Finally we use the extracted left and right line pixel coordinates in the `np.polyfit()` function to find the second order polynomials, and their respective x and y values:
+
+```python
     # Extract left and right line pixel positions
     leftx = nonzerox[left_lane_inds]
     lefty = nonzeroy[left_lane_inds]
@@ -258,80 +250,7 @@ def detect_lines(warped):
     right_fit = np.polyfit(righty, rightx, 2)
     left_fit = np.polyfit(lefty, leftx, 2)
 
-    # Sanity check:
-    # INIT
-    if (left_line.current_fit[0] == False):
-        left_line.current_fit = left_fit
-        right_line.current_fit = right_fit
-
-    if (abs(left_line.current_fit[1] - left_fit[1]) > 0.18):
-        left_line.current_fit = left_line.best_fit
-        left_line.detected = False
-    else:
-        left_line.current_fit = left_fit
-        left_line.recent_xfitted.pop()
-        left_line.recent_xfitted.appendleft(left_line.current_fit)
-        avg = np.array([0,0,0], dtype='float')
-        for element in left_line.recent_xfitted:
-            avg = avg + element
-        left_line.best_fit = avg / (len(left_line.recent_xfitted))
-
-    if (abs(right_line.current_fit[1] - right_fit[1]) > 0.18):
-        right_line.current_fit = right_line.best_fit
-        right_line.detected = False
-    else:
-        right_line.current_fit = right_fit
-        right_line.recent_xfitted.pop()
-        right_line.recent_xfitted.appendleft(right_line.current_fit)
-        avg = np.array([0,0,0], dtype='float')
-        for element in right_line.recent_xfitted:
-            avg = avg + element
-        right_line.best_fit = avg / (len(right_line.recent_xfitted))
-
-    if (abs(right_line.current_fit[1] - right_fit[1]) > 0.38 and
-        abs(left_line.current_fit[1] - left_fit[1]) < 0.1):
-        right_line.current_fit[0] = left_line.current_fit[0]
-        right_line.current_fit[1] = left_line.current_fit[1]
-        right_line.current_fit[2] = left_line.current_fit[2] + 600
-        right_line.recent_xfitted.pop()
-        right_line.recent_xfitted.appendleft(right_line.current_fit)
-        avg = np.array([0,0,0], dtype='float')
-        for element in right_line.recent_xfitted:
-            avg = avg + element
-        right_line.best_fit = avg / (len(right_line.recent_xfitted))
-
-    if (abs(left_line.current_fit[1] - left_fit[1]) > 0.38 and
-        abs(right_line.current_fit[1] - right_fit[1]) < 0.1):
-        left_line.current_fit = left_fit
-        left_line.recent_xfitted.pop()
-        left_line.recent_xfitted.appendleft(left_line.current_fit)
-        avg = np.array([0,0,0], dtype='float')
-        for element in left_line.recent_xfitted:
-            avg = avg + element
-        left_line.best_fit = avg / (len(left_line.recent_xfitted))
-
-    # Generate x and y values for plotting
-    ploty = np.linspace(0, warped.shape[0] - 1, warped.shape[0] )
-    left_fitx = (left_line.current_fit[0] * ploty**2 +
-                 left_line.current_fit[1] * ploty +
-                 left_line.current_fit[2])
-    right_fitx = (right_line.current_fit[0] * ploty**2 +
-                  right_line.current_fit[1] * ploty +
-                  right_line.current_fit[2])
-    out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
-    out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
-
-    fig = plt.figure(figsize=(18, 6))
-    plt.imshow(out_img)
-    plt.plot(left_fitx, ploty, color='yellow')
-    plt.plot(right_fitx, ploty, color='yellow')
-    plt.xlim(0, 1280)
-    plt.ylim(720, 0)
-
-    return out_img, ploty, leftx, lefty, rightx, righty, left_fit, right_fit, left_fitx, right_fitx
 ```
-
-Finally we save the left and right line pixel positions and use the `np.polyfit()` function to find the second order polynomials, and their respective x and y values.
 
 
 #### 5. Describe how you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
@@ -351,7 +270,7 @@ I found the position of the vehicle relative to center with the function `offset
     lane_midpoint = float(right_lane_bottom + left_lane_bottom) / 2
 ```
 
-Then it calculates the midpoint of the image in meters
+Then it calculates the midpoint of the image in meters:
 
 ```python  
     image_mid_point_in_meter = 1280/2 * xm_per_pix
